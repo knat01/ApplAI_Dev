@@ -16,7 +16,7 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 def main():
-    st.set_page_config(page_title="AI Job Application Assistant", page_icon="📄", layout="wide")
+    st.set_page_config(page_title="AI Job Application Assistant", page_icon="📄")
     st.title("AI Job Application Assistant")
 
     # Check if user is logged in
