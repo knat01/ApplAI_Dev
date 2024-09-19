@@ -2,9 +2,19 @@ import streamlit as st
 from pdfminer.high_level import extract_text
 from docx import Document
 import re
-from firebase_admin import firestore
+import firebase_admin
+from firebase_admin import credentials, firestore
+from config import firebase_config
 
-db = firestore.client()
+# Initialize Firebase
+try:
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(firebase_config)
+        firebase_admin.initialize_app(cred)
+    db = firestore.client()
+except Exception as e:
+    st.error(f"Error initializing Firebase: {str(e)}")
+    db = None
 
 def extract_text_from_pdf(file):
     return extract_text(file)
@@ -53,8 +63,11 @@ def upload_resume():
         st.write(parsed_data)
         
         if st.button("Save Resume Data"):
-            user_id = st.session_state.user['uid']
-            db.collection('users').document(user_id).set({
-                'resume_data': parsed_data
-            }, merge=True)
-            st.success("Resume data saved successfully!")
+            if db is not None:
+                user_id = st.session_state.user['uid']
+                db.collection('users').document(user_id).set({
+                    'resume_data': parsed_data
+                }, merge=True)
+                st.success("Resume data saved successfully!")
+            else:
+                st.error("Unable to save resume data due to database connection issues.")

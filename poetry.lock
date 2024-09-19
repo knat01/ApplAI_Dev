@@ -1441,6 +1441,33 @@ SQLAlchemy = ">=1.4,<3"
 tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<9.0.0"
 
 [[package]]
+name = "langchain-community"
+version = "0.3.0"
+description = "Community contributed LangChain integrations."
+optional = false
+python-versions = "<4.0,>=3.9"
+files = [
+    {file = "langchain_community-0.3.0-py3-none-any.whl", hash = "sha256:40084f1f785f0fb56c8698ff059bbda8bd8c683cbdffa7902a0e04e72961496c"},
+    {file = "langchain_community-0.3.0.tar.gz", hash = "sha256:1ee8a469ad66977f21b9d96bdcdd8549c5281c474f0f9cc13b932efd63a78105"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.8.3,<4.0.0"
+dataclasses-json = ">=0.5.7,<0.7"
+langchain = ">=0.3.0,<0.4.0"
+langchain-core = ">=0.3.0,<0.4.0"
+langsmith = ">=0.1.112,<0.2.0"
+numpy = [
+    {version = ">=1,<2", markers = "python_version < \"3.12\""},
+    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
+]
+pydantic-settings = ">=2.4.0,<3.0.0"
+PyYAML = ">=5.3"
+requests = ">=2,<3"
+SQLAlchemy = ">=1.4,<3"
+tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<9.0.0"
+
+[[package]]
 name = "langchain-core"
 version = "0.3.1"
 description = "Building applications with LLMs through composability"
@@ -2904,6 +2931,26 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
+name = "pydantic-settings"
+version = "2.5.2"
+description = "Settings management using Pydantic"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pydantic_settings-2.5.2-py3-none-any.whl", hash = "sha256:2c912e55fd5794a59bf8c832b9de832dcfdf4778d79ff79b708744eed499a907"},
+    {file = "pydantic_settings-2.5.2.tar.gz", hash = "sha256:f90b139682bee4d2065273d5185d71d37ea46cfe57e1b5ae184fc6a0b2484ca0"},
+]
+
+[package.dependencies]
+pydantic = ">=2.7.0"
+python-dotenv = ">=0.21.0"
+
+[package.extras]
+azure-key-vault = ["azure-identity (>=1.16.0)", "azure-keyvault-secrets (>=4.8.0)"]
+toml = ["tomli (>=2.0.1)"]
+yaml = ["pyyaml (>=6.0.1)"]
+
+[[package]]
 name = "pydeck"
 version = "0.9.1"
 description = "Widget for deck.gl maps"
@@ -3016,6 +3063,20 @@ files = [
 [package.dependencies]
 lxml = ">=3.1.0"
 typing-extensions = ">=4.9.0"
+
+[[package]]
+name = "python-dotenv"
+version = "1.0.1"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
+    {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
 
 [[package]]
 name = "pytz"
@@ -3999,4 +4060,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cefb112a4da63f93325bc8872e24a1f8614f0617088e6b7a0c57f50cef7d1326"
+content-hash = "185dd259ba615bdfefacc094cd0947f9d788e6ea38cc2427f4e2a68ffedae9ab"
