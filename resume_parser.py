@@ -1,3 +1,5 @@
+# resume_parser.py
+
 import streamlit as st
 from firebase_admin import firestore
 import firebase_admin
@@ -5,7 +7,7 @@ from firebase_admin import credentials
 from pdfminer.high_level import extract_text
 from docx import Document
 import yaml
-import openai
+from openai import OpenAI
 import config
 import os
 
@@ -21,8 +23,8 @@ def initialize_firebase():
 initialize_firebase()
 db = firestore.client()
 
-# Initialize OpenAI API
-openai.api_key = config.get_openai_api_key()
+# Initialize OpenAI client
+client = OpenAI(api_key=config.get_openai_api_key())
 
 def extract_text_from_pdf(file):
     """
@@ -69,53 +71,157 @@ def parse_resume_with_openai(text):
     Returns:
         dict: Parsed resume data structured as per the YAML template.
     """
+    prompt = f"""
+    You are an AI assistant that extracts information from resumes and structures it into a predefined YAML format. Below is the extracted text from a resume. Please fill in the YAML template accurately based on the information provided.
+
+    Extracted Resume Text:
+    \"\"\"
+    {text}
+    \"\"\"
+
+    YAML Template:
+    ```yaml
+    personal_information:
+      name: "[Your Name]"
+      surname: "[Your Surname]"
+      date_of_birth: "[Your Date of Birth]"
+      country: "[Your Country]"
+      city: "[Your City]"
+      address: "[Your Address]"
+      phone_prefix: "[Your Phone Prefix]"
+      phone: "[Your Phone Number]"
+      email: "[Your Email Address]"
+      github: "[Your GitHub Profile URL]"
+      linkedin: "[Your LinkedIn Profile URL]"
+
+    education_details:
+      - education_level: "[Your Education Level]"
+        institution: "[Your Institution]"
+        field_of_study: "[Your Field of Study]"
+        final_evaluation_grade: "[Your Final Evaluation Grade]"
+        start_date: "[Start Date]"
+        year_of_completion: "[Year of Completion]"
+        exam:
+          exam_name_1: "[Grade]"
+          exam_name_2: "[Grade]"
+          exam_name_3: "[Grade]"
+          exam_name_4: "[Grade]"
+          exam_name_5: "[Grade]"
+          exam_name_6: "[Grade]"
+
+    experience_details:
+      - position: "[Your Position]"
+        company: "[Company Name]"
+        employment_period: "[Employment Period]"
+        location: "[Location]"
+        industry: "[Industry]"
+        key_responsibilities:
+          - responsibility_1: "[Responsibility Description]"
+          - responsibility_2: "[Responsibility Description]"
+          - responsibility_3: "[Responsibility Description]"
+        skills_acquired:
+          - "[Skill]"
+          - "[Skill]"
+          - "[Skill]"
+
+      - position: "[Your Position]"
+        company: "[Company Name]"
+        employment_period: "[Employment Period]"
+        location: "[Location]"
+        industry: "[Industry]"
+        key_responsibilities:
+          - responsibility_1: "[Responsibility Description]"
+          - responsibility_2: "[Responsibility Description]"
+          - responsibility_3: "[Responsibility Description]"
+        skills_acquired:
+          - "[Skill]"
+          - "[Skill]"
+          - "[Skill]"
+
+    projects:
+      - name: "[Project Name]"
+        description: "[Project Description]"
+        link: "[Project Link]"
+
+      - name: "[Project Name]"
+        description: "[Project Description]"
+        link: "[Project Link]"
+
+    achievements:
+      - name: "[Achievement Name]"
+        description: "[Achievement Description]"
+      - name: "[Achievement Name]"
+        description: "[Achievement Description]"
+
+    certifications:
+      - name: "[Certification Name]"
+        description: "[Certification Description]"
+      - name: "[Certification Name]"
+        description: "[Certification Description]"
+
+    languages:
+      - language: "[Language]"
+        proficiency: "[Proficiency Level]"
+      - language: "[Language]"
+        proficiency: "[Proficiency Level]"
+
+    interests:
+      - "[Interest]"
+      - "[Interest]"
+      - "[Interest]"
+
+    availability:
+      notice_period: "[Notice Period]"
+
+    salary_expectations:
+      salary_range_usd: "[Salary Range]"
+
+    self_identification:
+      gender: "[Gender]"
+      pronouns: "[Pronouns]"
+      veteran: "[Yes/No]"
+      disability: "[Yes/No]"
+      ethnicity: "[Ethnicity]"
+
+    legal_authorization:
+      eu_work_authorization: "[Yes/No]"
+      us_work_authorization: "[Yes/No]"
+      requires_us_visa: "[Yes/No]"
+      requires_us_sponsorship: "[Yes/No]"
+      requires_eu_visa: "[Yes/No]"
+      legally_allowed_to_work_in_eu: "[Yes/No]"
+      legally_allowed_to_work_in_us: "[Yes/No]"
+      requires_eu_sponsorship: "[Yes/No]"
+
+    work_preferences:
+      remote_work: "[Yes/No]"
+      in_person_work: "[Yes/No]"
+      open_to_relocation: "[Yes/No]"
+      willing_to_complete_assessments: "[Yes/No]"
+      willing_to_undergo_drug_tests: "[Yes/No]"
+      willing_to_undergo_background_checks: "[Yes/No]"
+    ```
+
+    Please ensure that the YAML syntax is correct. If certain fields are not present in the resume text, leave them as empty strings or omit them.
+
+    Output the YAML only without any additional text.
+    """
+
     try:
-        # Read the YAML template from the file
-        template_path = "plain_text_resume.yaml"
-        if not os.path.exists(template_path):
-            st.error(f"YAML template file '{template_path}' not found.")
-            return {}
-
-        with open(template_path, "r") as file:
-            yaml_template = file.read()
-
-        prompt = f"""
-        You are an AI assistant that extracts information from resumes and structures it into a predefined YAML format. Below is the extracted text from a resume. Please fill in the YAML template accurately based on the information provided.
-
-        Extracted Resume Text:
-        \"\"\"
-        {text}
-        \"\"\"
-
-        YAML Template:
-        ```yaml
-        {yaml_template}
-        Please ensure that the YAML syntax is correct. If certain fields are not present in the resume text, leave them as empty strings or omit them.
-
-        Output the YAML only without any additional text. """
-
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that structures resume information into YAML format."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0,
-            max_tokens=2000,
-            n=1,
-            stop=None,
+            max_tokens=1500
         )
 
-        yaml_output = response.choices[0].message['content']
-
-        # Ensure that only YAML content is captured
-        if '```yaml' in yaml_output and '```' in yaml_output:
-            yaml_content = yaml_output.split('```yaml')[1].split('```')[0]
-        else:
-            yaml_content = yaml_output
+        yaml_output = response.choices[0].message.content
 
         # Load YAML to ensure it's valid
-        parsed_yaml = yaml.safe_load(yaml_content)
+        parsed_yaml = yaml.safe_load(yaml_output)
 
         return parsed_yaml
 
@@ -124,7 +230,9 @@ def parse_resume_with_openai(text):
         return {}
 
 def upload_resume():
-    """Streamlit interface for uploading and parsing resumes."""
+    """
+    Streamlit interface for uploading and parsing resumes.
+    """
     st.subheader("Upload Your Resume")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "docx"])
 
@@ -160,29 +268,15 @@ def upload_resume():
                 yaml_display = yaml.dump(parsed_data, sort_keys=False)
                 st.text_area("", yaml_display, height=600)
 
-                # Buttons for saving data
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("Save Parsed Data to Firestore"):
-                        try:
-                            # Ensure user is authenticated
-                            if 'user' not in st.session_state:
-                                st.error("You need to be logged in to save data.")
-                            else:
-                                user_id = st.session_state.user['uid']
-                                db.collection('users').document(user_id).set({
-                                    'parsed_resume': parsed_data
-                                }, merge=True)
-                                st.success("Parsed resume data saved to Firestore successfully!")
-                        except Exception as e:
-                            st.error(f"Error saving data to Firestore: {str(e)}")
-                with col2:
-                    if st.button("Save to YAML File"):
-                        try:
-                            with open("filled_resume.yaml", "w") as yaml_file:
-                                yaml.dump(parsed_data, yaml_file, sort_keys=False)
-                            st.success("Parsed resume data saved to filled_resume.yaml successfully!")
-                        except Exception as e:
-                            st.error(f"Error saving data to YAML file: {str(e)}")
+                if st.button("Save Parsed Data"):
+                    try:
+                        user_id = st.session_state.user['uid']
+                        db.collection('users').document(user_id).set({
+                            'parsed_resume': parsed_data
+                        }, merge=True)
+                        st.success("Parsed resume data saved successfully!")
+                    except Exception as e:
+                        st.error(f"Error saving data to Firestore: {str(e)}")
             else:
                 st.error("Failed to parse resume data.")
+
