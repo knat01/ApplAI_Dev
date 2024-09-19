@@ -277,6 +277,7 @@ def upload_resume():
                             'parsed_resume': parsed_data
                         }, merge=True)
                         st.success("Parsed resume data saved successfully!")
+                        st.balloons()  # Add a celebratory effect
                     except Exception as e:
                         st.error(f"Error saving data to Firestore: {str(e)}")
             else:
