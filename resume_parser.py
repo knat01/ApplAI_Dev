@@ -235,6 +235,12 @@ def upload_resume():
     """
     Streamlit interface for uploading and parsing resumes.
     """
+    # Check for success message from previous upload
+    if st.session_state.get('show_success', False):
+        st.success("Parsed resume data saved successfully!")
+        st.balloons()
+        st.session_state.show_success = False
+
     st.subheader("Upload Your Resume")
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "docx"])
 
@@ -278,8 +284,8 @@ def upload_resume():
                         }, merge=True)
                         st.success("Parsed resume data saved successfully!")
                         st.balloons()  # Add a celebratory effect
+                        st.session_state.show_success = True
                     except Exception as e:
                         st.error(f"Error saving data to Firestore: {str(e)}")
             else:
                 st.error("Failed to parse resume data.")
-
