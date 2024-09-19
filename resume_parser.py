@@ -4,12 +4,12 @@ from docx import Document
 import re
 import firebase_admin
 from firebase_admin import credentials, firestore
-from config import firebase_config
+from config import get_firebase_config
 
 # Initialize Firebase
 try:
     if not firebase_admin._apps:
-        cred = credentials.Certificate(firebase_config)
+        cred = credentials.Certificate(get_firebase_config())
         firebase_admin.initialize_app(cred)
     db = firestore.client()
 except Exception as e:

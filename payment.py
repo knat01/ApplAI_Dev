@@ -1,9 +1,9 @@
 import streamlit as st
 import stripe
 from firebase_admin import firestore
-from config import STRIPE_API_KEY
+from config import get_stripe_api_key
 
-stripe.api_key = STRIPE_API_KEY
+stripe.api_key = get_stripe_api_key()
 db = firestore.client()
 
 def show_upgrade_options():
