@@ -219,6 +219,8 @@ def parse_resume_with_openai(text):
         )
 
         yaml_output = response.choices[0].message.content
+        # Remove YAML markers if present
+        yaml_output = yaml_output.replace("```yaml", "").replace("```", "").strip()
 
         # Load YAML to ensure it's valid
         parsed_yaml = yaml.safe_load(yaml_output)
