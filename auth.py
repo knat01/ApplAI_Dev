@@ -130,9 +130,9 @@ def handle_google_signin():
     verifies the ID token, and logs the user in by setting session state.
     """
     # Parse the URL to get the authorization code
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params
     if "code" in query_params:
-        code = query_params["code"][0]
+        code = query_params["code"]
         # Exchange code for tokens
         token_url = "https://oauth2.googleapis.com/token"
         redirect_uri = config.get_redirect_uri()
